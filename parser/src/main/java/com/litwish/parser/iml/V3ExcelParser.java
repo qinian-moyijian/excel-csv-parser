@@ -15,7 +15,9 @@ import java.sql.Connection;
  * @Authror: Xiaoming Zhang
  */
 public class V3ExcelParser extends ExcelAbstractParser {
-
+    /**
+     * 此文件解析对应的数据库名称
+     */
     private static final String tableName = "test_cycle_stat_v3";
 
     public V3ExcelParser(String firstRelativeFilePath, String thirdRelativeFilePath) {
@@ -23,6 +25,9 @@ public class V3ExcelParser extends ExcelAbstractParser {
     }
 
     @Override
+    /**
+     * 具体的解析数据入库的过程
+     */
     public void process() throws Exception {
         logger.info("路径:{}", relativeFilePath);
         File dirFile = new File(relativeFilePath);

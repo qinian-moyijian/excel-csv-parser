@@ -17,14 +17,31 @@ import java.util.ArrayList;
  */
 public abstract class ExcelAbstractParser extends AbstractParser {
 
+    /**
+     * 文件的相对路径
+     */
     protected String relativeFilePath;
+    /**
+     * excel的二级路径名
+     */
     private String secondRelativeFilePath = "excel";
+    /**
+     * 具体需要解析的sheet
+     */
     private Sheet dataSheet;
+
 
     public ExcelAbstractParser(String firstRelativeFilePath, String thirdRelativeFilePath) {
         this.relativeFilePath = getPath(firstRelativeFilePath, secondRelativeFilePath, thirdRelativeFilePath);
     }
 
+    /**
+     * 校验文件格式是否正确(解析表头)
+     * @param workbook
+     * @param absolutePath
+     * @return
+     * @throws Exception
+     */
     public boolean check(Workbook workbook, String absolutePath) throws Exception {
         boolean hasSheet = false;
         for (Sheet sheet : workbook) {
@@ -58,6 +75,13 @@ public abstract class ExcelAbstractParser extends AbstractParser {
         return true;
     }
 
+    /**
+     * 解析具体内容
+     * @param connection
+     * @param absolutePath
+     * @param tableName
+     * @throws Exception
+     */
     public void parse(Connection connection, String absolutePath,String tableName) throws Exception {
         ArrayList<ArrayList<String>> datas = getDatas();
         connection.setAutoCommit(false);
@@ -71,6 +95,10 @@ public abstract class ExcelAbstractParser extends AbstractParser {
         }
     }
 
+    /**
+     * 获取excel中的具体数据封装成list
+     * @return
+     */
     public ArrayList<ArrayList<String>> getDatas(){
         ArrayList<ArrayList<String>> dataList = new ArrayList<>();
         for (Row row : dataSheet) {

@@ -6,5 +6,9 @@ package com.litwish.parser;
  * @Authror: Xiaoming Zhang
  */
 public interface Parser {
+    /**
+     * 解析文件
+     * @throws Exception
+     */
     void process() throws Exception;
 }

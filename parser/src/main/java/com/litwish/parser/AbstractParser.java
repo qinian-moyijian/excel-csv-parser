@@ -18,9 +18,20 @@ public abstract class AbstractParser implements Parser {
 
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
+    /**
+     * 文件字段与数据库字段映射
+     */
     protected Map<String, String> headMapping = new HashMap<String,String>();
+    /**
+     * 数据库与一行数据index映射
+     */
     protected Map<Integer,String> columnIndexMapping = new LinkedHashMap<Integer,String>();
 
+    /**
+     * 初始化文件字段与数据库字段映射
+     * @param connection
+     * @throws SQLException
+     */
     protected void intHead(Connection connection) throws SQLException {
         String className = this.getClass().getSimpleName();
         Statement statement = connection.createStatement();
@@ -31,6 +42,11 @@ public abstract class AbstractParser implements Parser {
         logger.info("获取到head映射:{}",headMapping.toString());
     }
 
+    /**
+     * 拼接不同文件路径,获取文件的相对路径
+     * @param paths
+     * @return
+     */
     protected String getPath(String... paths){
         String filePath="";
         for (String path :paths) {
@@ -39,6 +55,12 @@ public abstract class AbstractParser implements Parser {
        return filePath;
     }
 
+    /**
+     * 插入一条数据
+     * @param oneData
+     * @param ps
+     * @throws SQLException
+     */
     protected void oncePs(ArrayList<String> oneData, PreparedStatement ps) throws SQLException {
         for (int i = 0; i < oneData.size(); i++) {
             String columnValue = oneData.get(i);
@@ -47,6 +69,11 @@ public abstract class AbstractParser implements Parser {
         ps.addBatch();
     }
 
+    /**
+     * 创建出preparedStatement的insert into的sql语句
+     * @param tableName
+     * @return
+     */
     protected String getPrepareSQL(String tableName){
         String buildSql = "insert into %s (%s) values(%s);";
         StringBuilder sqlPreBuilder = new StringBuilder();
