@@ -1,6 +1,12 @@
 package com.litwish;
 
-import com.litwish.connect.ConnectUtils;
+import com.litwish.parser.Parser;
+import com.litwish.parser.iml.M2CSVParser;
+import com.litwish.parser.iml.M2ExcelParser;
+import com.litwish.parser.iml.V3CSVParser;
+import com.litwish.parser.iml.V3ExcelParser;
+
+import java.util.ArrayList;
 
 /**
  * @Description: TODO
@@ -13,16 +19,15 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         String firstRelativeFilePath = "C:/Users/七年/Desktop/新建文件夹 (2)";
-//        V3ExcelParser v3ExcelParser = new V3ExcelParser(firstRelativeFilePath,V3_PATH);
-//        M2ExcelParser m2ExcelParser = new M2ExcelParser(firstRelativeFilePath,M2_PATH);
-//        V3CSVParser v3CSVParser = new V3CSVParser(firstRelativeFilePath,V3_PATH);
-//        M2CSVParser m2CSVParser = new M2CSVParser(firstRelativeFilePath,M2_PATH);
-//        ArrayList<Parser> tasks = new ArrayList<>();
-//        tasks.add(v3ExcelParser);
-//        tasks.add(m2ExcelParser);
-//        tasks.add(v3CSVParser);
-//        tasks.add(m2CSVParser);
-//        Submitter.submit(tasks);
-        ConnectUtils.getConnection();
+        V3ExcelParser v3ExcelParser = new V3ExcelParser(firstRelativeFilePath,V3_PATH);
+        M2ExcelParser m2ExcelParser = new M2ExcelParser(firstRelativeFilePath,M2_PATH);
+        V3CSVParser v3CSVParser = new V3CSVParser(firstRelativeFilePath,V3_PATH);
+        M2CSVParser m2CSVParser = new M2CSVParser(firstRelativeFilePath,M2_PATH);
+        ArrayList<Parser> tasks = new ArrayList<>();
+        tasks.add(v3ExcelParser);
+        tasks.add(m2ExcelParser);
+        tasks.add(v3CSVParser);
+        tasks.add(m2CSVParser);
+        Submitter.submit(tasks);
     }
 }
