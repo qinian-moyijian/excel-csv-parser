@@ -17,14 +17,14 @@ import java.util.Iterator;
  */
 public class CSVTest {
     public static void main(String[] args) throws Exception {
-        String defaultPath = "C:\\Users\\七年\\Desktop\\新建文件夹\\V3\\点数据";
+        String defaultPath = "C:\\Users\\七年\\Desktop\\新建文件夹\\M2\\点数据";
         String fileDir = System.getProperty("file.dir");
         String path = fileDir==null?defaultPath:fileDir;
         File dir = new File(path);
         System.out.println(path);
         File[] files = dir.listFiles();
         for (File file : files) {
-            System.out.println(file.getName());
+            //System.out.println(file.getName());
             final CSVParser parser = new CSVParserBuilder().withSeparator(',').withIgnoreQuotations(false).build();
             try (CSVReader csvReader = new CSVReaderBuilder(new InputStreamReader(new FileInputStream(file),"gbk")).withCSVParser(parser).build();) {
                 Iterator<String[]> iterator = csvReader.iterator();
@@ -33,12 +33,10 @@ public class CSVTest {
                     i++;
                     String[] cols = iterator.next();
                     for (String col : cols) {
-                        System.out.print(col + "-");
+                        System.out.print(col+ " ");
                     }
                     System.out.print("\n");
-                    if (i==2) {
-                        break;
-                    }
+                    break;
                 }
             }
         }

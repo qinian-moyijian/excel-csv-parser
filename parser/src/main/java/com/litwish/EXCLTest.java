@@ -16,8 +16,8 @@ import java.io.FileInputStream;
  */
 public class EXCLTest {
     public static void main(String[] args) throws Exception {
-      //  String path = "C:\\Users\\七年\\Desktop\\新建文件夹\\V3\\新建文件夹";
-       String path = "C:\\Users\\七年\\Desktop\\新建文件夹\\M2\\循环数据";
+       //String path = "C:\\Users\\七年\\Desktop\\新建文件夹\\M2\\循环数据";
+       String path = "C:\\Users\\七年\\Desktop\\新建文件夹\\V3\\循环数据";
         File dir = new File(path);
         File[] files = dir.listFiles();
 

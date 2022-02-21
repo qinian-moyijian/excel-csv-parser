@@ -9,14 +9,15 @@ import com.litwish.parser.CSVAbstractParser;
  */
 public class V3CSVParser extends CSVAbstractParser {
 
+    /**
+     * 此文件解析对应的数据库名称
+     */
+    private static final String TABLE_NAME = "test_detail_data_v3";
 
-    private  String thirdRelativeFilePath = "V3";
-
-
-
-    @Override
-    public void process() throws Exception {
-
+    public V3CSVParser(String firstRelativeFilePath, String thirdRelativeFilePath) {
+        super(firstRelativeFilePath, thirdRelativeFilePath, TABLE_NAME);
     }
+
+
 }
 

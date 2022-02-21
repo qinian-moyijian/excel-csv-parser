@@ -1,11 +1,15 @@
 package com.litwish.parser;
 
+import com.litwish.connect.ConnectUtils;
+import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -30,13 +34,19 @@ public abstract class ExcelAbstractParser extends AbstractParser {
      */
     private Sheet dataSheet;
 
+    /**
+     * 表名
+     */
+    private String tableName;
 
-    public ExcelAbstractParser(String firstRelativeFilePath, String thirdRelativeFilePath) {
+    protected ExcelAbstractParser(String firstRelativeFilePath, String thirdRelativeFilePath, String tableName) {
         this.relativeFilePath = getPath(firstRelativeFilePath, secondRelativeFilePath, thirdRelativeFilePath);
+        this.tableName = tableName;
     }
 
     /**
      * 校验文件格式是否正确(解析表头)
+     *
      * @param workbook
      * @param absolutePath
      * @return
@@ -58,7 +68,7 @@ public abstract class ExcelAbstractParser extends AbstractParser {
                             return false;
                         }
                         int columnIndex = cell.getColumnIndex();
-                        columnIndexMapping.put(columnIndex, dbColumn);
+                        columnIndexMapping.put(dbColumn,columnIndex);
                     }
                     if (headMapping.size() != columnIndexMapping.size()) {
                         logger.error("文件{}中列与配置列个数不匹配;{}", absolutePath, columnIndexMapping.toString());
@@ -75,45 +85,78 @@ public abstract class ExcelAbstractParser extends AbstractParser {
         return true;
     }
 
+
+    /**
+     * 获取excel中的具体数据封装成list
+     *
+     * @return
+     */
+    public ArrayList<ArrayList<String>> getDatas() {
+        ArrayList<ArrayList<String>> dataList = new ArrayList<>();
+        for (Row row : dataSheet) {
+            ArrayList<String> oneData = new ArrayList<String>();
+            for (Integer index : columnIndexMapping.values()) {
+                Cell cell = row.getCell(index);
+                String value = cell == null ? "" : cell.getStringCellValue().trim();
+                oneData.add(value);
+            }
+            dataList.add(oneData);
+        }
+        return dataList;
+    }
+
+    @Override
+    /**
+     * 具体的解析数据入库的过程
+     */
+    public void process() throws Exception {
+        logger.info("路径:{}", relativeFilePath);
+        File dirFile = new File(relativeFilePath);
+        File[] files = dirFile.listFiles();
+        try (Connection connection = ConnectUtils.getConnection()) {
+            intHead(connection);
+            for (File file : files) {
+                String absolutePath = relativeFilePath + file.getName();
+                logger.info("获取到文件:{}", absolutePath);
+                FileInputStream in = new FileInputStream(file);
+                try (Workbook workbook = StreamingReader.builder()
+                        .rowCacheSize(100)
+                        .bufferSize(1024)
+                        .open(in);) {
+                    boolean check = check(workbook, absolutePath);
+                    if (!check) {
+                        logger.error("校验失败{},中止", absolutePath);
+                        return;
+                    }
+                    logger.info("校验成功{},数据库与excel列对应关系:{}", absolutePath, columnIndexMapping.toString());
+                    logger.info("文件开始解析进入临时表...{}", absolutePath);
+                    parse(connection,file);
+                    logger.info("解析文件进入临时表成功{}", absolutePath);
+                }
+            }
+            logger.info("路径{}数据开始进入最终表{}", relativeFilePath, tableName);
+            copyDataToFinalTable(connection,tableName);
+            logger.info("路径{}解析成功", relativeFilePath);
+        }
+    }
+
     /**
      * 解析具体内容
+     *
      * @param connection
-     * @param absolutePath
-     * @param tableName
      * @throws Exception
      */
-    public void parse(Connection connection, String absolutePath,String tableName) throws Exception {
+    public void parse(Connection connection,File... files) throws Exception {
         ArrayList<ArrayList<String>> datas = getDatas();
         connection.setAutoCommit(false);
-        String prepareSQL = getPrepareSQL(tableName+"_tmp");
-        try(PreparedStatement ps = connection.prepareStatement(prepareSQL);) {
+        String prepareSQL = getPrepareSQL(tableName + TEMP_TABLE_SUFFIX);
+        try (PreparedStatement ps = connection.prepareStatement(prepareSQL);) {
             for (ArrayList<String> data : datas) {
-                oncePs(data,ps);
+                oncePs(data, ps);
             }
             ps.executeBatch();
             connection.commit();
         }
     }
-
-    /**
-     * 获取excel中的具体数据封装成list
-     * @return
-     */
-    public ArrayList<ArrayList<String>> getDatas(){
-        ArrayList<ArrayList<String>> dataList = new ArrayList<>();
-        for (Row row : dataSheet) {
-            ArrayList<String> list = new ArrayList<>();
-            for (Integer index : columnIndexMapping.keySet()) {
-                Cell cell = row.getCell(index);
-                String value= cell == null ? "":cell.getStringCellValue().trim();
-                list.add(value);
-            }
-            dataList.add(list);
-        }
-        return dataList;
-    }
-
-
-
 
 }

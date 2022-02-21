@@ -2,8 +2,6 @@ package com.litwish.parser.iml;
 
 import com.litwish.parser.CSVAbstractParser;
 
-import java.util.HashMap;
-
 /**
  * @Description: TODO
  * @Date: 2022/2/17 15:59
@@ -11,14 +9,13 @@ import java.util.HashMap;
  */
 public class M2CSVParser extends CSVAbstractParser {
 
-    private String thirdRelativeFilePath = "M2";
+    /**
+     * 此文件解析对应的数据库名称
+     */
+    private static final String TABLE_NAME = "test_detail_data_m2";
 
-    private HashMap<String, String> mapping;
-    private HashMap<String, Integer> columnIndexMapping;
-
-
-    @Override
-    public void process() throws Exception {
-
+    public M2CSVParser(String firstRelativeFilePath, String thirdRelativeFilePath) {
+        super(firstRelativeFilePath, thirdRelativeFilePath, TABLE_NAME);
     }
+
 }
